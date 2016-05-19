@@ -2,7 +2,11 @@
 by Ronald Rihoo
 ========================================================
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r echo=FALSE, messages=FALSE, packages}
 # Loads necessary libraries.
 initialize <- function() 
 {
@@ -19,7 +23,7 @@ initialize();
 
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
-setwd("~/Data Analysis Projects/Project 4/Project4")
+setwd("~/projects/Uda_Project_4")
 
 import <- function(filename)
 {
@@ -31,15 +35,15 @@ data <- import('prosperLoanData.csv')
 
 # Introduction
 
-#### I have chosen to analyze this dataset, because I want to investigate the nature of how Prosper loans are assessed for risk. I'll first take a general look at the dataset to get a feel for a few variables of interest, then I will check for relationships between these variables.
-
-#### My ultimate goal is to see what generally affects the rate and loan amount.
+I have chosen to analyze this dataset, because I want to investigate the nature of how Prosper loans are assessed for risk. I'll first take a general look at the dataset to get a feel for a few variables of interest, then I will check for relationships between these variables.
+ 
+My ultimate goal is to see what generally affects the rate and loan amount.
 
 # Univariate Section
 
 ### Quick Overview of Several Variables in the Dataset.
 
-####Most of the loans in this dataset are given to employed individuals who have a Prosper score that ranges between 4 to 8; a lower-range credit score between 660 and 720; and an upper-range credit score between 679 and 739. 
+Most of the loans in this dataset are given to employed individuals who have a Prosper score that ranges between 4 to 8; a lower-range credit score between 660 and 720; and an upper-range credit score between 679 and 739. 
 
 ```{r echo=TRUE}
 summary(data$EmploymentStatus)
@@ -48,9 +52,9 @@ summary(data$CreditScoreRangeLower)
 summary(data$CreditScoreRangeUpper)
 ```
 
-####On average, borrowers had a debt-to-income ratio of 0.22, with 4 delinquencies within the 7 years prior to review, and 1-to-2 credit inquiries within six months prior to review.
+On average, borrowers had a debt-to-income ratio of 0.22, with 4 delinquencies within the 7 years prior to review, and 1-to-2 credit inquiries within six months prior to review.
 
-```{r echo=TRUE}
+```{r echo=TRUE, eval=TRUE}
 summary(data$DebtToIncome)
 describe(data$DebtToIncome)
 summary(data$DelinquenciesLast7Years)
@@ -58,7 +62,7 @@ summary(data$InquiriesLast6Months)
 summary(data$CreditScoreRangeUpper)
 ```
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, eval=TRUE, Univariate_Plots}
 #Univariate Plots
 
 qplot(data$ProsperScore,
@@ -125,7 +129,7 @@ ggplot(aes(InquiriesLast6Months),
 
 ```
 
-####The most common loans are $4,000 in a 36-month term and are supported by one investor each.
+The most common loans are $4,000 in a 36-month term and are supported by one investor each.
 
 ```{r echo=FALSE}
 
@@ -136,12 +140,14 @@ ggplot(aes(LoanOriginalAmount),
   ylab("Count") +
   geom_histogram()
 
+data$Term <- factor(data$Term, levels=c(12,36,60), ordered=TRUE)
+
 ggplot(aes(Term),  
        data = data) +
   ggtitle('Loan Term') + 
   xlab("Months") +
   ylab("Count") +
-  geom_histogram()
+  geom_bar()
 
 ggplot(aes(Investors),
        data = data) +
@@ -150,10 +156,10 @@ ggplot(aes(Investors),
   ylab("Count") +
   geom_histogram(binwidth = 1) +
   scale_x_continuous(limit = c(0, 200))
-  
+
 ```
 
-####The average loan payment is $272.5/month, but the most common is about $173.71/month.
+The average loan payment is $272.5/month, but the most common is about $173.71/month.
 
 ```{r echo=FALSE}
 summary(data$MonthlyLoanPayment)
@@ -165,11 +171,10 @@ ggplot(aes(MonthlyLoanPayment),
   ggtitle('Monthly Payments on Loan') + 
   xlab("Amount per Month (in US Dollars)") + 
   ylab("Count") +
-  geom_histogram(binwidth = 1) #+
-  #scale_x_continuous(limits = c(0,1000))
+  geom_histogram(binwidth = 1)
 ```
 
-####Most loans are taken by individuals who listed their occupation as "other" and "professional."
+Most loans are taken by individuals who listed their occupation as "other" and "professional."
 
 ```{r echo=FALSE}
 ggplot(aes(Occupation),  
@@ -182,7 +187,7 @@ ggplot(aes(Occupation),
   theme(axis.text.x = element_text(angle=60, hjust=1))
 ```
 
-####Unemployed individuals also received loans. In the bivariate section, I'll compare the loan amount given to unemployed individuals versus those who are employed.
+Unemployed individuals also received loans. In the bivariate section, I'll compare the loan amount given to unemployed individuals versus those who are employed.
 
 ```{r echo=FALSE}
 ggplot(aes(EmploymentStatus),  
@@ -198,32 +203,32 @@ ggplot(aes(EmploymentStatus),
 
 ### What is the structure of your dataset?
 
-####There are 113,937 loans in the dataset with 81 variables, such as Prosper score, credit score, delinquencies in the last 7 years, open credit lines, and so on.
+There are 113,937 loans in the dataset with 81 variables, such as Prosper score, credit score, delinquencies in the last 7 years, open credit lines, and so on.
 
 ### What is/are the main feature(s) of interest in your dataset?
 
-####I am investigating the factors that affect the borrower rate and loan amount. I figure that I should first understand what factors affect the Prosper Score, so my interests are the Prosper score, credit scores, delinquencies, occupations, employment statuses, income, borrowers' rate, APR, and original loan amount.
+I am investigating the factors that affect the borrower rate and loan amount. I figure that I should first understand what factors affect the Prosper Score, so my interests are the Prosper score, credit scores, delinquencies, occupations, employment statuses, income, borrowers' rate, APR, and original loan amount.
 
 ### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
 
-####The other items that could help support my investigation are the revolving credit balance, the individual's homeownership status, and the individual's public records within the past 10 years. I assume that since people grant other people loans, then that must mean that a level of human judgement, regarding the overall trustworthiness of an individual, helps decide what amount the individual will be granted and how much the interest rate and APR will be.
+The other items that could help support my investigation are the revolving credit balance, the individual's homeownership status, and the individual's public records within the past 10 years. I assume that since people grant other people loans, then that must mean that a level of human judgement, regarding the overall trustworthiness of an individual, helps decide what amount the individual will be granted and how much the interest rate and APR will be.
 
 ### Did you create any new variables from existing variables in the dataset?
 
-####Not in this section; however, it was tempting to mess with the income range variable.
+Not in this section; however, it was tempting to mess with the income range variable.
 
 ### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
 
-####I haven't observed any unusual distributations yet.
+I haven't observed any unusual distributations yet.
 
 
 # Bivariate Plots Section
 
-####How much of an affect does the Prosper score have on the individual's loan application? And what can the Prosper score tell us about the lenders and the borrowers? Can the data show us its affects, if we compare it to one variable at a time?
+How much of an affect does the Prosper score have on the individual's loan application? And what can the Prosper score tell us about the lenders and the borrowers? Can the data show us its affects, if we compare it to one variable at a time?
 
-####Let's first take a look at the potential effects of the Prosper score on the loan approval process.
+Let's first take a look at the potential effects of the Prosper score on the loan approval process.
 
-####Does the Prosper score affect the amount of loan given to borrowers?
+Does the Prosper score affect the amount of loan given to borrowers?
 
 ```{r echo=FALSE}
 ggplot(aes(ProsperScore, LoanOriginalAmount),  
@@ -234,9 +239,9 @@ ggplot(aes(ProsperScore, LoanOriginalAmount),
   geom_point()
 ```
 
-####It appears that there may be a pattern.
+It appears that there may be a pattern.
 
-####Momentarily disregarding the slight odd cases under each Prosper score,-which we could consider as a type of conditional disturbance in a potential trend,-we observe for the pattern in the highest concentrated areas:
+Momentarily disregarding the slight odd cases under each Prosper score,-which we could consider as a type of conditional disturbance in a potential trend,-we observe for the pattern in the highest concentrated areas:
 
 *Prosper score  1: $10,000 <br>
 *Prosper score  2: $15,000 <br>
@@ -249,78 +254,63 @@ ggplot(aes(ProsperScore, LoanOriginalAmount),
 *Prosper score  9: $25,000 <br>
 *Prosper score 10: $25,000 <br>
 
-####There's not that much of a pattern here. It could be that people with higher Prosper scores allow themselves to take bigger loans due to their better conditions for paying it back. But taking another look at this data may give more insight into possible underlying patterns.
-
-```{r echo=FALSE}
+  There's not that much of a pattern here. It could be that people with higher Prosper scores allow themselves to take bigger loans due to their better conditions for paying it back. But taking another look at this data may give more insight into possible underlying patterns.
+  
+  ```{r echo=FALSE}
 ggplot(aes(ProsperScore, LoanOriginalAmount),  
        data = data) +
   ggtitle('Original Loan Amount versus Prosper Score') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 ```
 
-####Now it's more apparent that most loans in this data are taken in $1,000 multiples, with $15,000 as the most common upper amount, and with $25,000 following. This means that we might not be able to extract much information from the loan amount, since, from score 3 and up, it's possible to get a $35,000 loan.
+Now it's more apparent that most loans in this data are taken in $1,000 multiples, with $15,000 as the most common upper amount, and with $25,000 following. This means that we might not be able to extract much information from the loan amount, since, from score 3 and up, it's possible to get a $35,000 loan.
 
-#### Does the Prosper score have an effect on the borrower's APR and rate?
+ Does the Prosper score have an effect on the borrower's APR and rate?
 
 ```{r echo=FALSE}
 
 ggplot(aes(ProsperScore, BorrowerAPR),  
        data = data) +
   ggtitle('Borrower APR versus Prosper Score') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 
 ggplot(aes(ProsperScore, BorrowerRate),  
        data = data) +
   ggtitle('Borrower Rate versus Prosper Score') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 ```
 
-####Here is the first major sign of the Prosper score showing a relationship to the loans. The higher the Prosper score, the lower the borrower APR and rate. But of course, as it is common knowledge, we know that the better credit history an individual has, the more trustworthy he/she becomes to lenders. And the Prosper score is a risk score based on historical Prosper data. But we also know that we haven't yet seen evidence of it being related to the credit score of the individual.
+Here is the first major sign of the Prosper score showing a relationship to the loans. The higher the Prosper score, the lower the borrower APR and rate. But of course, as it is common knowledge, we know that the better credit history an individual has, the more trustworthy he/she becomes to lenders. And the Prosper score is a risk score based on historical Prosper data. But we also know that we haven't yet seen evidence of it being related to the credit score of the individual.
 
-####So is it safe to say that, in order to get a good, low APR and rate on a Prosper loan, then one must have a high Prosper score? Well, let's find out what else might be affecting the borrower APR and rate.
+So is it safe to say that, in order to get a good, low APR and rate on a Prosper loan, then one must have a high Prosper score? Well, let's find out what else might be affecting the borrower APR and rate.
 
-####Could the credit score be affecting them?
+Could the credit score be affecting them?
 
 ```{r echo=FALSE}
 ggplot(aes(CreditScoreRangeLower, BorrowerAPR),  
        data = data) +
   ggtitle('Borrower APR versus Credit Score (Lower-Range)') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 
 ggplot(aes(CreditScoreRangeUpper, BorrowerAPR),  
        data = data) +
   ggtitle('Borrower APR versus Credit Score (Upper-Range)') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 
 ggplot(aes(CreditScoreRangeLower, BorrowerRate),  
        data = data) +
   ggtitle('Borrower Rate versus Credit Score (Lower-Range)') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 
 ggplot(aes(CreditScoreRangeUpper, BorrowerRate),  
        data = data) +
   ggtitle('Borrower Rate versus Credit Score (Upper-Range)') + 
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
-
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 ```
 
-####Yes, but something looks a bit odd about it. The patterns are not as clear and consistent as when comparing to the Prosper score. So it's probably safe to say that the Prosper score is a better measure for what the borrower APR and rate will be like.
+Yes, but something looks a bit odd about it. The patterns are not as clear and consistent as when comparing to the Prosper score. So it's probably safe to say that the Prosper score is a better measure for what the borrower APR and rate will be like.
 
-####So then what affects the Prosper score? Does the employment status show to affect it?
+So then what affects the Prosper score? Does the employment status show to affect it?
 
 ```{r echo=FALSE}
 ggplot(aes(ProsperScore, EmploymentStatus),  
@@ -328,12 +318,12 @@ ggplot(aes(ProsperScore, EmploymentStatus),
   ggtitle('Employment Status vs Prosper Score') + 
   xlab("Prosper Score") +
   ylab("Employment Status") +
-  geom_point()
+  geom_point(alpha = 1/20, position = position_jitter())
 ```
 
-####Employment status shows to not affect the Prosper score; at least not signficantly. We could add a bit of noise to have a better look, and who knows, it might reveal something good, but there are other ways to look at this, so I'll move on for now.
+Employment status mostly appears to be constant along all Prosper scores for each employment status. Other things could also be seen here, such as how there are less individuals with a Prosper score of 1, 9, and 10. 
 
-####Does income have an effect on the Prosper score?
+Does income have an effect on the Prosper score?
 
 ```{r echo=FALSE}
 ggplot(aes(ProsperScore, IncomeRange), 
@@ -341,12 +331,13 @@ ggplot(aes(ProsperScore, IncomeRange),
   ggtitle('Income Range vs Prosper Score') +
   xlab("Prosper Score") +
   ylab("Income Range") +
-  geom_point() 
+  geom_point(alpha = 1/20, position = position_jitter())
+
 ```
 
-####Income range does not appear to have any absolute effects on the Prosper score; although, there may be an exception with a Prosper score of 10. But it could just be that no one in this dataset with an income range of $0 has a Prosper score of 10. So, at this time, and in this view, we can rule income range out as a significant variable, until we take another look at it later.
+Income range does not appear to have any absolute effects on the Prosper score; although, there may be an exception with a Prosper score of 10. But it could just be that no one in this dataset with an income range of $0 has a Prosper score of 10. So, at this time, and in this view, we can rule income range out as a significant variable, until we take another look at it later.
 
-####We should pay attention to the relationship between the income range and the original loan amount. Perhaps, we should even quickly take a look to see if homeowners are treated differently here.
+We should pay attention to the relationship between the income range and the original loan amount. Perhaps, we should even quickly take a look to see if homeowners are treated differently here.
 
 
 ```{r echo=FALSE}
@@ -355,16 +346,14 @@ ggplot(aes(IncomeRange, LoanOriginalAmount),
   ggtitle('Loan Original Amount vs Income Range') +
   xlab("Income Range") +
   ylab("Loan Original Amount") +
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0)) +
+  geom_point(alpha = 1/20, position = position_jitter(h = 0)) +
   # labels need to be turned at an angle to be readable
   theme(axis.text.x = element_text(angle=60, hjust=1))
 ```
 
-####Well, here, we can observe something satisfying to the eye: only those who made over $100,000/year received loans over $25,000. It's also notable that we can add this plot to the evidence for the fact that those with the unemployed status received less amounts. 
+Well, here, we can observe something satisfying to the eye: only those who made over $100,000/year received loans over $25,000. It's also notable that we can add this plot to the evidence for the fact that those with the unemployed status received less amounts. 
 
-####Let's briefly take a closer look just to further analyze the relevance of the Prosper score to the original loan amount.
+Let's briefly take a closer look just to further analyze the relevance of the Prosper score to the original loan amount.
 
 ```{r echo=FALSE}
 
@@ -374,14 +363,14 @@ summary(six_figures$ProsperScore)
 
 ggplot(aes(IncomeRange, ProsperScore), 
        data = six_figures) +
-  ggtitle('Prosper Score vs Income Range') +
+  ggtitle('Prosper Score vs Income Range ($100,000+)') +
   xlab("Income Range") +
   ylab("Prosper Score") +
   geom_boxplot() 
 
 ```
 
-####This is some good detail that was not apparent in the earlier plots. In this case, we must also observe the lower income range to see if the Prosper score proves to be different. If not, then we can rule income range out for good in my investigation.
+This is some good detail that was not apparent in the earlier plots. In this case, we must also observe the lower income range to see if the Prosper score proves to be different. If not, then we can rule income range out for good in my investigation.
 
 ```{r echo=FALSE}
 
@@ -392,31 +381,31 @@ summary(six_figures$ProsperScore)
 
 ggplot(aes(IncomeRange, ProsperScore), 
        data = twenty_five) +
-  ggtitle('Prosper Score vs Income Range') +
+  ggtitle('Prosper Score vs Income Range ($1-24,999)') +
   xlab("Income Range") +
   ylab("Prosper Score") +
   geom_boxplot() 
 
 ```
 
-####We may now assume that earning over $100,000/year will earn about 2 points on the Prosper score, since the difference between the average of the lower incomes and the higher incomes is about almost two points; whereas, the median and 3rd quartile are exactly 2 points away. That was a slight surprise. I think that I was ready to rule income out far too early. It could also be that there are 81 variables in this dataset and I am eager to look through many of them.
+We may now assume that earning over $100,000/year will earn about 2 points on the Prosper score, since the difference between the average of the lower incomes and the higher incomes is about almost two points; whereas, the median and 3rd quartile are exactly 2 points away. That was a slight surprise. I think that I was ready to rule income out far too early. It could also be that there are 81 variables in this dataset and I am eager to look through many of them.
 
-####Let's see if occupation shows any trends in the Prosper score:
+Let's see if occupation shows any trends in the Prosper score:
 
 ```{r echo=FALSE}
-ggplot(aes(Occupation, ProsperScore),  
+ggplot(aes(ProsperScore, Occupation),  
        data = data) +
-  ggtitle('Prosper Score vs Occupation') + 
-  xlab("Prosper Score") +
-  ylab("Occupation") +
-  geom_point() +
-  # labels need to be turned at an angle to be readable
-  theme(axis.text.x = element_text(angle=60, hjust=1))
+  ggtitle('Occupation vs Prosper Score') + 
+  xlab("Occupation") +
+  ylab("Prosper Score") +
+  geom_point(alpha = 1/20, position = position_jitter(h = 0)) +
+  theme(axis.text.y = element_text(size = 6))
+
 ```
 
-####There seems to be nothing significant with occupation. It looks like nearly anyone with any occupation could have a high or low Prosper score. The little bit of differences seen in the plot are most likely due to the dataset not having more individuals of those occupations. So it's probably a matter of the dataset itself, as opposed to the relationships in the data.
+There seems to be nothing significant with occupation. It looks like nearly anyone with any occupation could have a high or low Prosper score. The little bit of differences seen in the plot are most likely due to the dataset not having more individuals of those occupations. So it's probably a matter of the dataset itself, as opposed to the relationships in the data.
 
-####Are credit-seekers discriminated against in the Prosper scoring system?
+Are credit-seekers discriminated against in the Prosper scoring system?
 
 ```{r echo=FALSE}
 ggplot(aes(ProsperScore, TotalInquiries),  
@@ -427,9 +416,9 @@ ggplot(aes(ProsperScore, TotalInquiries),
   geom_point() 
 ```
 
-####It doesn't look like a significant difference. It looks a bit wavy and rules the idea out from this perspective.
+It doesn't look like a significant difference. It looks a bit wavy and rules the idea out from this perspective.
 
-####How about delinquencies in the past 7 years?
+How about delinquencies in the past 7 years?
 
 ```{r echo=FALSE}
 ggplot(aes(ProsperScore, DelinquenciesLast7Years),  
@@ -437,67 +426,69 @@ ggplot(aes(ProsperScore, DelinquenciesLast7Years),
   ggtitle('Delinquencies in Last 7 Years vs Prosper Score') + 
   xlab("Prosper Score") +
   ylab("# of Delinquencies") +
-  geom_point() +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0))
+  geom_point(alpha = 1/20, position = position_jitter(h = 0))
 
 ```
 
-####The curve in this graph renders that idea useless, as one would easily expect that the number of delinquencies within a 7-year period would continuously decrease along the Prosper scores, from lowest to highest. The reasoning is that those who were able to obtain a higher Prosper score were those who were able to make their payments on time throughout the years; however, that does not seem to be the case here.
+The curve in this graph renders that idea useless, as one would easily expect that the number of delinquencies within a 7-year period would continuously decrease along the Prosper scores, from lowest to highest. The reasoning is that those who were able to obtain a higher Prosper score were those who were able to make their payments on time throughout the years; however, that does not seem to be the case here.
 
-####Now let's go back to employment status, since we found something interesting earlier. The unemployed individuals in the dataset have loans anywhere between $1,000 to $25,000. Most are $4,000.
+Now let's go back to employment status, since we found something interesting earlier. The unemployed individuals in the dataset have loans anywhere between $1,000 to $25,000. Most are $4,000.
 
-####It would be a good idea to see what their credit is like. They could have been unemployed for any reason.
+It would be a good idea to see what their credit is like. They could have been unemployed for any reason.
 
 ```{r echo=FALSE}
 Unemployed <- subset(data, EmploymentStatus=="Not employed" & !is.na("EmploymentStatus"))
 
-qplot(x = EmploymentStatus, y = CreditScoreRangeLower,
-      data = subset(Unemployed, !is.na(CreditScoreRangeLower)),
-      main = "Credit Score (Lower Range) vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Credit Score",
-      geom = 'boxplot') 
+NE_CS_LR <- qplot(x = EmploymentStatus, y = CreditScoreRangeLower,
+              data = subset(Unemployed, !is.na(CreditScoreRangeLower)),
+              xlab = "Employment Status",
+              ylab = "Credit Score (Lower-Range)",
+              geom = 'boxplot') 
 
-qplot(x = EmploymentStatus, y = CreditScoreRangeUpper,
-      data = subset(Unemployed, !is.na(CreditScoreRangeUpper)),
-      main = "Credit Score (Upper Range) vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Credit Score",
-      geom = 'boxplot') 
+NE_CS_UR <- qplot(x = EmploymentStatus, y = CreditScoreRangeUpper,
+              data = subset(Unemployed, !is.na(CreditScoreRangeUpper)),
+              xlab = "Employment Status",
+              ylab = "Credit Score (Upper-Range)",
+              geom = 'boxplot') 
+
+grid.arrange(NE_CS_LR, NE_CS_UR, 
+             ncol=2,
+             top = "Credit Score vs Employment Status (Unemployed)")
 
 qplot(x = EmploymentStatus, y = ProsperScore,
-      data = subset(Unemployed, !is.na(ProsperScore)),
-      main = "Prosper Score vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Prosper Score",
-      geom = 'boxplot') 
+  data = subset(Unemployed, !is.na(ProsperScore)),
+  main = "Prosper Score vs Employment Status (Not Employed)",
+  xlab = "Employment Status",
+  ylab = "Prosper Score",
+  geom = 'boxplot') 
 
 Employed <- subset(data, EmploymentStatus=="Employed" & !is.na("EmploymentStatus"))
 
-qplot(x = EmploymentStatus, y = CreditScoreRangeLower,
-      data = subset(Employed, !is.na(CreditScoreRangeLower)),
-      main = "Credit Score (Lower Range) vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Credit Score",
-      geom = 'boxplot') 
+EM_CS_LR <- qplot(x = EmploymentStatus, y = CreditScoreRangeLower,
+              data = subset(Employed, !is.na(CreditScoreRangeLower)),
+              xlab = "Employment Status",
+              ylab = "Credit Score (Lower-Range)",
+              geom = 'boxplot') 
 
-qplot(x = EmploymentStatus, y = CreditScoreRangeUpper,
-      data = subset(Employed, !is.na(CreditScoreRangeUpper)),
-      main = "Credit Score (Upper Range) vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Credit Score",
-      geom = 'boxplot') 
+EM_CS_UR <- qplot(x = EmploymentStatus, y = CreditScoreRangeUpper,
+              data = subset(Employed, !is.na(CreditScoreRangeUpper)),
+              xlab = "Employment Status",
+              ylab = "Credit Score (Upper-Range)",
+              geom = 'boxplot') 
+
+grid.arrange(EM_CS_LR, EM_CS_UR, 
+             ncol=2,
+             top = "Credit Score vs Employment Status (Employed)")
 
 qplot(x = EmploymentStatus, y = ProsperScore,
-      data = subset(Employed, !is.na(ProsperScore)),
-      main = "Prosper Score vs Employment Status",
-      xlab = "Employment Status",
-      ylab = "Prosper Score",
-      geom = 'boxplot') 
+  data = subset(Employed, !is.na(ProsperScore)),
+  main = "Prosper Score vs Employment Status (Employed)",
+  xlab = "Employment Status",
+  ylab = "Prosper Score",
+  geom = 'boxplot') 
 ```
 
-####Does the credit score have an effect on the Prosper score?
+Does the credit score have an effect on the Prosper score?
 
 ```{r echo=FALSE}
 # CS_PS - Credit Score vs Prosper Score
@@ -510,47 +501,52 @@ CS_PS <- subset(CS_PS, !(is.na(data.CreditScoreRangeLower)) &
                        !(is.na(data.ProsperScore)) &
                        !(data.ProsperScore == 11))
 
-ggplot(aes(data.CreditScoreRangeLower, data.ProsperScore), 
-       data = CS_PS) +
-  ggtitle('Prosper Score vs Credit Score (Lower-Range)') +
-  xlab("Credit Score") +
-  ylab("Prosper Score") +
-  geom_point() +
-  scale_x_continuous(limits = c(600, 900))
+PS_CS_UR <- ggplot(aes(data.CreditScoreRangeLower, data.ProsperScore), 
+                   data = CS_PS) +
+            xlab("Credit Score (Lower-Range)") +
+            ylab("") +
+            geom_point(alpha = 1/20, position = position_jitter(h = 0)) +
+            scale_x_continuous(limits = c(600, 900))
+          
+PS_CS_LR <- ggplot(aes(data.CreditScoreRangeUpper, data.ProsperScore), 
+                   data = CS_PS) +
+            xlab("Credit Score (Upper-Range)") +
+            ylab("") +
+            geom_point(alpha = 1/20, position = position_jitter(h = 0)) + 
+            scale_x_continuous(limits = c(600, 900))
 
-ggplot(aes(data.CreditScoreRangeUpper, data.ProsperScore), 
-       data = CS_PS) +
-  ggtitle('Prosper Score vs Credit Score (Lower-Range)') +
-  xlab("Credit Score") +
-  ylab("Prosper Score") +
-  geom_point() +
-  scale_x_continuous(limits = c(600, 900))
+grid.arrange(PS_CS_UR, 
+             PS_CS_LR,
+             ncol=2,
+             top="Prosper Score vs Credit Score",
+             left="Prosper Score")
+
 ```
 
-####Not significantly enough. If someone with a credit score of ~630 could have a Prosper score of 10 (the highest), and if someone with a credit score of ~840 could have a Prosper score of 1 (the lowest), then I want to move on to the variables that are more promising.
+Not significantly enough. If someone with a credit score of ~630 could have a Prosper score of 10 (the highest), and if someone with a credit score of ~840 could have a Prosper score of 1 (the lowest), then I want to move on to the variables that are more promising.
 
 # Bivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
 
-####Unemployed individuals received loans of lesser amounts than employed individuals (perhaps they asked for less), but they, for the most part, have similar credit scores compared to the employed individuals.
+Unemployed individuals received loans of lesser amounts than employed individuals (perhaps they asked for less), but they, for the most part, have similar credit scores compared to the employed individuals.
 
-####Regardless, the employed individuals, overall, have higher Prosper scores than the unemployed individuals, so it could be that the unemployed individuals are granted lesser amounts due to the lenders having less confidence in the loan being paid off.
+Regardless, the employed individuals, overall, have higher Prosper scores than the unemployed individuals, so it could be that the unemployed individuals are granted lesser amounts due to the lenders having less confidence in the loan being paid off.
 
-####Another important factor is that Individuals with credit scores between 600 and 800+ could all have a Prosper score of 1. In fact, even individuals with credit scores of 600 could have a Prosper score of 10. 
+Another important factor is that Individuals with credit scores between 600 and 800+ could all have a Prosper score of 1. In fact, even individuals with credit scores of 600 could have a Prosper score of 10. 
 
 ### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
 
-#### Those with more credit inquiries and more delinquencies over the prior 7 years did not show to have significant penalties in their Prosper score rating; however, the score could have been compensated in other ways.
+Those with more credit inquiries and more delinquencies over the prior 7 years did not show to have significant penalties in their Prosper score rating; however, the score could have been compensated in other ways.
 
 ### What was the strongest relationship you found?
 
-####It seems that higher income results in obtaining a higher Prosper score and having the option of higher loan amounts. Another fact that could support this is that those who reported to be unemployed had lesser loan amounts, even though they appeared to have higher credit scores (not Prosper scores). So the amount of income might be a strong relationship to risk assessment within the Prosper community.
+It seems that higher income results in obtaining a higher Prosper score and having the option of higher loan amounts. Another fact that could support this is that those who reported to be unemployed had lesser loan amounts, even though they appeared to have higher credit scores (not Prosper scores). So the amount of income might be a strong relationship to risk assessment within the Prosper community.
 
 
 # Multivariate Plots Section
 
-```{r echo=FALSE}
+```{r echo=FALSE, Multivariate_Plots}
 
 numeric_vars <- data.frame(data['ProsperScore'],
                            data['Term'],
@@ -558,19 +554,19 @@ numeric_vars <- data.frame(data['ProsperScore'],
                            data['CreditScoreRangeUpper'],
                            data['InquiriesLast6Months'],
                            data['DelinquenciesLast7Years'],
-                           data['RevolvingCreditBalance']))
+                           data['RevolvingCreditBalance'])
 
 #shows the scatter plots and correlations of all the variables
 pairs.panels(numeric_vars)
 
 tail(numeric_vars)
 head(numeric_vars)
+
 ```
 
-####Individuals with a Prosper score between 1 and 3 mostly have less original loan amounts than those with a score between 4 and 10. The only significant advantage in having a Prosper score higher than 4, 5, and 6 is that those who are 'not employed,' or have an employment status of 'other,' receive higher original loan amounts.
+Individuals with a Prosper score between 1 and 3 mostly have less original loan amounts than those with a score between 4 and 10. The only significant advantage in having a Prosper score higher than 4, 5, and 6 is that those who are 'not employed,' or have an employment status of 'other,' receive higher original loan amounts.
 
-```{r echo=FALSE, Multivariate_Plots}
-
+```{r echo=FALSE}
 ProsperScore123 <- subset(data, 
                           ProsperScore==1 | 
                           ProsperScore==2 | 
@@ -591,19 +587,22 @@ ProsperScore789 <- subset(data,
                           !is.na("ProsperScore"))
 
 Plot_PS123 <- qplot(x = EmploymentStatus, y = LoanOriginalAmount,
-                  data = subset(ProsperScore123, !is.na(LoanOriginalAmount)),
-                  geom = 'boxplot',
-                  main = 'Prosper Scores 1, 2, and 3') 
-                  
+                    data = subset(ProsperScore123, !is.na(LoanOriginalAmount)),
+                    geom = 'boxplot',
+                    main = 'Prosper Scores 1, 2, and 3',
+                    ylim = c(0, 20000)) 
+
 Plot_PS456 <- qplot(x = EmploymentStatus, y = LoanOriginalAmount,
-                  data = subset(ProsperScore456, !is.na(LoanOriginalAmount)),
-                  geom = 'boxplot',
-                  main = 'Prosper Scores 4, 5, and 6')
+                    data = subset(ProsperScore456, !is.na(LoanOriginalAmount)),
+                    geom = 'boxplot',
+                    main = 'Prosper Scores 4, 5, and 6',
+                    ylim = c(0, 25000))
 
 Plot_PS789 <- qplot(x = EmploymentStatus, y = LoanOriginalAmount,
-                  data = subset(ProsperScore789, !is.na(LoanOriginalAmount)),
-                  geom = 'boxplot',
-                  main = 'Prosper Scores 7, 8, 9, and 10')
+                    data = subset(ProsperScore789, !is.na(LoanOriginalAmount)),
+                    geom = 'boxplot',
+                    main = 'Prosper Scores 7, 8, 9, and 10',
+                    ylim = c(0, 30000))
 
 grid.arrange(Plot_PS123, Plot_PS456, Plot_PS789)
 
@@ -654,118 +653,146 @@ PS_9 <- subset(data, (ProsperScore == 9) &
                      !is.na(LoanOriginalAmount))
 
 PS_10 <- subset(data, (ProsperScore == 10) &
-                     !is.na(ProsperScore) &
-                     !(ProsperScore == 11) &
-                     !is.na(LoanOriginalAmount))
+                      !is.na(ProsperScore) &
+                      !(ProsperScore == 11) &
+                      !is.na(LoanOriginalAmount))
 
 plot_PS_1 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_1,
-                geom = 'boxplot',
-                xlab = "1",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_1,
+                   geom = 'boxplot',
+                   xlab = "1",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 10000))
 
 plot_PS_2 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_2,
-                geom = 'boxplot',
-                xlab = "2",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_2,
+                   geom = 'boxplot',
+                   xlab = "2",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 5000))
 
 plot_PS_3 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_3,
-                geom = 'boxplot',
-                xlab = "3",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_3,
+                   geom = 'boxplot',
+                   xlab = "3",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 20000))
 
 plot_PS_4 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_4,
-                geom = 'boxplot',
-                xlab = "4",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_4,
+                   geom = 'boxplot',
+                   xlab = "4",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 20000))
 
 plot_PS_5 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_5,
-                geom = 'boxplot',
-                xlab = "5",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_5,
+                   geom = 'boxplot',
+                   xlab = "5",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 20000))
 
 plot_PS_6 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_6,
-                geom = 'boxplot',
-                xlab = "6",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_6,
+                   geom = 'boxplot',
+                   xlab = "6",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 25000))
 
 plot_PS_7 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_7,
-                geom = 'boxplot',
-                xlab = "7",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_7,
+                   geom = 'boxplot',
+                   xlab = "7",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 25000))
 
 plot_PS_8 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_8,
-                geom = 'boxplot',
-                xlab = "8",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_8,
+                   geom = 'boxplot',
+                   xlab = "8",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 25000))
 
 plot_PS_9 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_9,
-                geom = 'boxplot',
-                xlab = "9",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                   data = PS_9,
+                   geom = 'boxplot',
+                   xlab = "9",
+                   ylab = "",
+                   fill=I("red"),
+                   col=I("blue"),
+                   ylim = c(0, 25000))
 
 plot_PS_10 <- qplot(x = ProsperScore, y = LoanOriginalAmount,
-                data = PS_10,
-                geom = 'boxplot',
-                xlab = "10",
-                ylab = "",
-                fill=I("red"),
-                col=I("blue"))
+                    data = PS_10,
+                    geom = 'boxplot',
+                    xlab = "10",
+                    ylab = "",
+                    fill=I("red"),
+                    col=I("blue"),
+                    ylim = c(0, 25000))
 
 grid.arrange(plot_PS_1, plot_PS_2, plot_PS_3, plot_PS_4, plot_PS_5,
              plot_PS_6, plot_PS_7, plot_PS_8, plot_PS_9, plot_PS_10,
-             ncol=2, 
+             ncol=4, 
              top="Original Loan Amount vs Prosper Score", 
              bottom="Prosper Score",
              left="Original Loan Amount")
 
 ```
 
+
+```{r echo=FALSE}
+
+#RColorBrewer::display.brewer.all(n=9, exact.n=FALSE)
+
+data_n <- subset(data, !(ProsperScore == 11) & !is.na(ProsperScore))
+
+ggplot(aes(LoanOriginalAmount, BorrowerRate, color=factor(ProsperScore)),        
+       data = data_n) +
+  ggtitle('Relationship between Loan Amount, Borrower Rate, and Prosper Score') +
+  geom_point(size = 3, alpha = 1/20, position = position_jitter(h = 0)) +
+  xlab("Original Loan Amount") +
+  ylab("Borrower Rate") +
+  theme(axis.text.x = element_text(angle=60, hjust=1))
+
+```
+
+It's apparent that the rate decreases as the loan amount increases, and that the higher loan amounts are given to those who have a high Prosper score.
+
+
 # Multivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
 
-####The Prosper score seems to show a significant effect on the amount of loan granted when it is between 1 and 6, but it seems to have a stagnant effect on the loan amount when it is 6 or more. At which point, other matters show more of an effect, such as employment status.
+The Prosper score seems to show a significant effect on the amount of loan granted when it is between 1 and 6, but it seems to have a stagnant effect on the loan amount when it is 6 or more. At which point, other matters show more of an effect, such as employment status.
 
 ### Were there any interesting or surprising interactions between features?
 
-####Self-employed individuals appear to be trusted just as much as the non-self-employed individuals. At first, one may assume that self-employed individuals could be seen as ones who face higher risks and might be judged to have less income security.
+Self-employed individuals appear to be trusted just as much as the non-self-employed individuals. At first, one may assume that self-employed individuals could be seen as ones who face higher risks and might be judged to have less income security.
 
 
 ------
-
+  
 # Final Plots and Summary
 
 ### Plot One
 ```{r echo=FALSE, Plot_One}
-
-data_n <- subset(data, !(ProsperScore == 11) & !is.na(ProsperScore))
 
 ggplot(aes(factor(ProsperScore), BorrowerRate), 
        data = data_n) +
@@ -778,13 +805,13 @@ ggplot(aes(factor(ProsperScore), BorrowerRate),
 
 ### Description One
 
-#### The median, Q1, and Q3 of the borrower rate decreases as the Prosper score increases. The decrease in the median and Q3 of the borrower rate is discontinued for Prosper score 5 in this dataset, but it's continued again from score 6 to 10. Other factors may have affected the borrower rate for those with a Prosper score of 5 in this dataset.
+The median, Q1, and Q3 of the borrower rate decreases as the Prosper score increases. The decrease in the median and Q3 of the borrower rate is discontinued for Prosper score 5 in this dataset, but it's continued again from score 6 to 10. Other factors may have affected the borrower rate for those with a Prosper score of 5 in this dataset.
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
 
 ggplot(aes(IncomeRange, LoanOriginalAmount),  
-               data = data) +
+       data = data) +
   ggtitle('Loan Amount versus Income Range') + 
   geom_boxplot() +
   xlab("Income Range") +
@@ -795,33 +822,34 @@ ggplot(aes(IncomeRange, LoanOriginalAmount),
 
 ### Description Two
 
-####As the income range increases, so does the median loan amount, along with the first and third quartiles. This trend is most likely due to the availability of higher loan amounts with respect to higher income ranges. 
+As the income range increases, so does the median loan amount, along with the first and third quartiles. This trend is most likely due to the availability of higher loan amounts with respect to higher income ranges. 
 
-####The $0 plot appears similar to the $25,000-49,999 and may be used as a way to not provide income information. It could be that when the income information is not provided, the individual is assumed to have the same level of risk as someone who has an income range of $25,000-49,999.
+The $0 plot appears similar to the $25,000-49,999 and may be used as a way to not provide income information. It could be that when the income information is not provided, the individual is assumed to have the same level of risk as someone who has an income range of $25,000-49,999.
 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
 
 ggplot(aes(LoanOriginalAmount, BorrowerRate, color=factor(ProsperScore)),        
-               data = data_n) +
-  ggtitle('Relationship between Loan Amount, Borrower Rate, 
-          and Prosper Score') + 
-  geom_point(size = 2) +
-  geom_point(alpha = 1/20) +
-  geom_point(position = position_jitter(h = 0)) +
-  xlab("Original Loan Amount") +
+       data = data_n) +
+  ggtitle('Relationship between Loan Amount, Borrower Rate, and Prosper Score') +
+  geom_point(size = 3, alpha = 1/20, position = position_jitter(h = 0)) +
+  xlab("Original Loan Amount ($)") +
   ylab("Borrower Rate") +
+  scale_colour_brewer("Prosper Score", palette="PuBuGn") +
   theme(axis.text.x = element_text(angle=60, hjust=1))
-
 
 ```
 
 ### Description Three
 
-#### As apparent, the borrower rate decreases as the original loan amount increases. It's also evident that those with the higher Prosper scores are mostly awarded low rates.
+The borrower rate decreases as the original loan amount increases. It's also evident that those with the higher Prosper scores are mostly awarded lower rates. For instance, loans that are above $25,000 are given at a rate below 0.2, and loans below $15,000 are given at rates between 0.05 and 0.35.
 
 ------
-
+  
 # Reflection
+  
+This dataset shows that many factors go into assessing risk before a Prosper loan is granted, since the Prosper score seems to be affected by other variables that I have yet to analyze. But, ultimately, the variables that are most relative to the outcome of the borrower rate and loan amount are the individual's income range and Prosper score. Through analysis, it becomes apparent that the Prosper score also increases by about 2 points for those who have an income range of over six figures. So, overall, it's safe to conclude that the income range is the biggest factor in risk assessment for Prosper loans. However, other factors also affect the Prosper score, such as employment status and ones that I have not analyzed. In order to better understand the Prosper score, the rest of the 81 variables should be compared to it. 
 
-#### This dataset shows that many factors go into assessing risk before a Prosper loan is granted, since the Prosper score seems to be affected by other variables that I have yet to analyze. But, ultimately, the variables that are most relative to the outcome of the borrower rate and loan amount are the individual's income range and Prosper score. Through analysis, it becomes apparent that the Prosper score also increases by about 2 points for those who have an income range of over six figures. So, overall, it's safe to conclude that the income range is the biggest factor in risk assessment for Prosper loans. However, other factors also affect the Prosper score, such as employment status and ones that I have not analyzed. In order to better understand the Prosper score, the rest of the 81 variables should be compared to it. My conclusion is that employed individuals with high income ranges are granted the lowest rates and the highest loan amounts. I suppose that, from the lenders' end, this goes hand-in-hand with the good ole market ideology of "low risk, low gain/loss; high risk, high gain/loss."
+One of the biggest challenges that I faced in this analysis was computing power. I had to work on the desktop to have access to the beefier hardware (an i7), because it takes a long time to get these plots up for analysis and verification. I eventually started using NoMachine to regain mobility. So I have been accessing the desktop with a laptop. 
+
+My conclusion is that employed individuals with high income ranges are granted the lowest rates and the highest loan amounts. I suppose that, from the lenders' end, this goes hand-in-hand with the good ole market ideology of "low risk, low gain/loss; high risk, high gain/loss." This is some good knowledge to have, but the most valuable part of this analysis is that it helped me become familiar with analyzing loans and risk models. At least, next time, I'll have a better intuition for where to begin and what type of questions to ask. 
